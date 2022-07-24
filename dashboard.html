@@ -27,7 +27,7 @@ const operationsDoc = `
   query Dashboard {
     questionnaire(where: {answers: {handled: {_eq: false}}}) {
       question
-      answers {
+      answers (where: {handled: {_eq: false}}){
         timestamp
       }
     }
