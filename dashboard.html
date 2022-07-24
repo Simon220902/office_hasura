@@ -11,6 +11,7 @@ async function fetchGraphQL(operationsDoc, operationName, variables) {
   const result = await fetch(
     "https://inspired-kangaroo-40.hasura.app/v1/graphql",
     {
+      "x-hasura-role": "public_user",
       method: "POST",
       body: JSON.stringify({
         query: operationsDoc,
