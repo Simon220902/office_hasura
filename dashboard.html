@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script>
+            /*
+This is an example snippet - you should consider tailoring it
+to your service.
+*/
+
+async function fetchGraphQL(operationsDoc, operationName, variables) {
+  const result = await fetch(
+    "undefined",
+    {
+      method: "POST",
+      body: JSON.stringify({
+        query: operationsDoc,
+        variables: variables,
+        operationName: operationName
+      })
+    }
+  );
+
+  return await result.json();
+}
+
+const operationsDoc = `
+  query Dashboard {
+    questionnaire(where: {answers: {handled: {_eq: false}}}) {
+      question
+      answers {
+        timestamp
+      }
+    }
+  }
+  
+  mutation NewAnswer($question_id: Int) {
+    insert_answer(objects: {question_id: $question_id}) {
+      affected_rows
+    }
+  }
+  
+  mutation Handle($question_id: Int) {
+    update_answer(where: {question_id: {_eq: $question_id}}, _set: {handled: true}) {
+      affected_rows
+    }
+  }
+`;
+
+function fetchDashboard() {
+  return fetchGraphQL(
+    operationsDoc,
+    "Dashboard",
+    {}
+  );
+}
+
+function executeNewAnswer(question_id) {
+  return fetchGraphQL(
+    operationsDoc,
+    "NewAnswer",
+    {"question_id": question_id}
+  );
+}
+
+function executeHandle(question_id) {
+  return fetchGraphQL(
+    operationsDoc,
+    "Handle",
+    {"question_id": question_id}
+  );
+}
+
+async function startFetchDashboard() {
+  const { errors, data } = await fetchDashboard();
+
+  if (errors) {
+    // handle those errors like a pro
+    console.error(errors);
+  }
+
+  // do something great with this precious data
+  console.log(data);
+}
+
+startFetchDashboard();
+
+async function startExecuteNewAnswer(question_id) {
+  const { errors, data } = await executeNewAnswer(question_id);
+
+  if (errors) {
+    // handle those errors like a pro
+    console.error(errors);
+  }
+
+  // do something great with this precious data
+  console.log(data);
+}
+
+startExecuteNewAnswer(question_id);
+
+async function startExecuteHandle(question_id) {
+  const { errors, data } = await executeHandle(question_id);
+
+  if (errors) {
+    // handle those errors like a pro
+    console.error(errors);
+  }
+
+  // do something great with this precious data
+  console.log(data);
+}
+
+startExecuteHandle(question_id);
+        </script>
+        <title>Dashboard</title>
+    </head>
+    <body>
+        <h1>DASHBOARD</h1>
+    </body>
+</html>
