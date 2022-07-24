@@ -45,6 +45,13 @@ const operationsDoc = `
       affected_rows
     }
   }
+
+  query QuestionMenu {
+    questionnaire {
+      id
+      question
+    }
+  }
 `;
 
 function fetchDashboard() {
@@ -71,6 +78,14 @@ function executeHandle(question_id) {
   );
 }
 
+function fetchQuestionMenu() {
+  return fetchGraphQL(
+    operationsDoc,
+    "QuestionMenu",
+    {}
+  );
+}
+
 async function startFetchDashboard() {
   const { errors, data } = await fetchDashboard();
 
@@ -83,7 +98,7 @@ async function startFetchDashboard() {
   console.log(data);
 }
 
-startFetchDashboard();
+//startFetchDashboard();
 
 async function startExecuteNewAnswer(question_id) {
   const { errors, data } = await executeNewAnswer(question_id);
@@ -113,10 +128,23 @@ async function startExecuteHandle(question_id) {
 
 //startExecuteHandle(question_id);
 
+async function startFetchQuestionMenu() {
+  const { errors, data } = await fetchQuestionMenu();
+
+  if (errors) {
+    // handle those errors like a pro
+    console.error(errors);
+  }
+
+  // do something great with this precious data
+  console.log(data);
+}
+
+startFetchQuestionMenu();
         </script>
-        <title>Dashboard</title>
+        <title>Answer</title>
     </head>
     <body>
-        <h1>DASHBOARD</h1>
+        <h1>What is wrong</h1>
     </body>
 </html>
