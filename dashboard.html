@@ -9,7 +9,7 @@ to your service.
 
 async function fetchGraphQL(operationsDoc, operationName, variables) {
   const result = await fetch(
-    "undefined",
+    "https://inspired-kangaroo-40.hasura.app/v1/graphql",
     {
       method: "POST",
       body: JSON.stringify({
