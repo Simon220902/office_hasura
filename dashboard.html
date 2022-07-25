@@ -28,6 +28,7 @@ const operationsDoc = `
   query Dashboard {
     questionnaire(where: {answers: {handled: {_eq: false}}}) {
       question
+      id
       answers (where: {handled: {_eq: false}}){
         timestamp
       }
@@ -80,10 +81,8 @@ async function startFetchDashboard() {
   }
 
   // do something great with this precious data
-  console.log(data);
+  return data;
 }
-
-startFetchDashboard();
 
 async function startExecuteNewAnswer(question_id) {
   const { errors, data } = await executeNewAnswer(question_id);
@@ -115,10 +114,82 @@ async function startExecuteHandle(question_id) {
 
         </script>
         <script type="text/javascript" src="qrcode.js"></script>
+        <!--TABLE STYLES-->
+        <style>
+          table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+          }
+          
+          td, th {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+          }
+          
+          tr:nth-child(even) {
+            background-color: #dddddd;
+          }
+          </style>
         <title>Dashboard</title>
     </head>
     <body>
         <h1>DASHBOARD</h1>
+
+        <h3>Answers</h3>
+
+        <table id="answer-table">
+        </table>
+        <script>
+          let dashboardDataExample = JSON.parse('{"data":{"questionnaire":[{"question":"Mangler der kaffe?","id":1,"answers":[{"timestamp":"2022-07-24T21:56:07.615685+00:00"}, {"timestamp":"2022-07-24T23:54:21.435277+00:00"}, {"timestamp":"2022-07-25T00:25:21.371914+00:00"}]}, {"question":"Mangler der te?","id":2,"answers":[{"timestamp":"2022-07-24T23:33:03.384717+00:00"}, {"timestamp":"2022-07-24T23:41:44.97466+00:00"}]}, {"question":"Mangler der mælk?","id":3,"answers":[{"timestamp":"2022-07-24T23:52:35.545017+00:00"}]}, {"question":"Virker kaffemaskinen ikke?","id":4,"answers":[{"timestamp":"2022-07-24T23:34:02.405077+00:00"}, {"timestamp":"2022-07-24T23:41:02.779034+00:00"}, {"timestamp":"2022-07-24T23:41:47.738121+00:00"}]}, {"question":"Virker lyset ikke?","id":5,"answers":[{"timestamp":"2022-07-24T23:33:33.856203+00:00"}, {"timestamp":"2022-07-24T23:41:06.270079+00:00"}, {"timestamp":"2022-07-24T23:52:38.96573+00:00"}, {"timestamp":"2022-07-24T23:54:23.758758+00:00"}, {"timestamp":"2022-07-25T00:25:15.707321+00:00"}]}, {"question":"Mangler der brus i vandhanen?","id":6,"answers":[{"timestamp":"2022-07-25T00:17:47.120994+00:00"}]}]}}');
+          let answerTable = document.getElementById("answer-table");
+          async function generateAnswerTable(){
+            answerTable.innerHTML =  `<tr>
+                                        <th>ID</th>
+                                        <th>Question</th>
+                                        <th>Unchecked Answers</th>
+                                        <th>CHECK!</th>
+                                      </tr>`;
+          
+            startFetchDashboard().then((dashboardData) => {    
+              console.log("DASHBOARDDATA: ", dashboardData);        
+              dashboardData["questionnaire"].forEach(questionBlock => {
+                let id = questionBlock["id"];
+                let question = questionBlock["question"];
+                let uncheckedAnswers = questionBlock["answers"];
+                
+                //Generate row
+                let newRow = document.createElement("tr");
+                
+                let idTd = document.createElement("td");
+                idTd.innerText = id;
+                newRow.appendChild(idTd);
+
+                let questionTd = document.createElement("td");
+                questionTd.innerText = question;
+                newRow.appendChild(questionTd);
+
+                let uncheckedTd = document.createElement("td");
+                uncheckedTd.innerText = uncheckedAnswers.length;
+                newRow.appendChild(uncheckedTd);
+
+                let checkTd = document.createElement("td");
+                let checkButton = document.createElement("button");
+                checkButton.innerText = `Check all with id: ${id}`;
+                checkButton.setAttribute("onclick", `startExecuteHandle(${id}).then(generateAnswerTable);`);
+                checkTd.appendChild(checkButton);
+                newRow.appendChild(checkTd);
+
+                answerTable.appendChild(newRow);
+              });
+            });
+          }
+
+          generateAnswerTable();
+        </script>
+
+        <h3>Make QR-code</h3>
         <input type="text" id="qrcode-text" value="">
         <input type="button" id="generateQRcode" value="MAKE QRCODE">
         <div id="qrcode" style="width:100px; height:100px; margin-top:15px;"></div>
