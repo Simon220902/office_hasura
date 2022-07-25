@@ -239,7 +239,7 @@ async function startFetchQuestionMenu() {
             }
 
             startFetchQuestionMenu().then((data) => {
-                let questionnaireJSONData = data;x
+                let questionnaireJSONData = data;
                 console.log("JSON: ", questionnaireJSONData);
                 generateQuestionnaireGUI(questionnaireJSONData["questionnaire"]);
             });
