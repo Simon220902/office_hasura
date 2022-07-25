@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <!--HASURA interaction script-->
         <script>
             /*
 This is an example snippet - you should consider tailoring it
@@ -137,14 +138,111 @@ async function startFetchQuestionMenu() {
   }
 
   // do something great with this precious data
-  console.log(data);
+  return data;
 }
-
-startFetchQuestionMenu();
         </script>
+
         <title>Answer</title>
     </head>
     <body>
-        <h1>What is wrong</h1>
+
+
+        <h1 id="start-header">What is wrong</h1>
+        <div id="questionnaire-div">
+            <h3>HE HE</h3>
+        </div>
+
+        <h1 id="success-header" style="display: none;">You succesfully registered a WRONG</h1>
+        <p id="success-text" style="display: none;"></p>
+        <button id="success-return-button" style="display: none;" onclick="hideSuccessElements(); showQuestionnaireElements();">Return to questionnaire</button>
+        <!--Form generating script-->
+        <script>
+            // Create a break line element
+            let br = document.createElement("br");
+        
+            let example_questionnaire_JSON = JSON.parse('{"questionnaire":[{"id":1,"question":"Mangler der kaffe?"}, {"id":2,"question":"Mangler der te?"}, {"id":3,"question":"Mangler der mælk?"}, {"id":4,"question":"Virker kaffemaskinen ikke?"}, {"id":5,"question":"Virker lyset ikke?"}]}');
+        
+            let questionnaire_div = document.getElementById("questionnaire-div");
+
+            function generateQuestionnaireGUI(questionnaire_Array) {
+                // Create a form dynamically
+                questionnaire_Array.forEach(question => {
+                    let new_question_radio = document.createElement("input");
+                    new_question_radio.setAttribute("type", "radio");
+                    new_question_radio.setAttribute("name", "questionnaire");
+                    new_question_radio.setAttribute("id", `${question["id"]}`);
+        
+                    let new_question_label = document.createElement("label");
+                    new_question_label.innerText = `${question["question"]}`;
+        
+        
+                    //Put the new_question input element into the div
+                    console.log("DIV: ", questionnaire_div);
+                    console.log("RADIO:", new_question_radio);
+                    questionnaire_div.appendChild(new_question_radio);
+                    questionnaire_div.appendChild(new_question_label);
+                    // Inserting a line break
+                    questionnaire_div.appendChild(br.cloneNode());
+                });
+                // create a send button
+                var s = document.createElement("input");
+                s.setAttribute("type", "button");
+                s.setAttribute("value", "Send");
+                s.setAttribute("onclick", "submitToggled();");
+        
+                // Append the submit button to the div
+                questionnaire_div.appendChild(s);
+            }
+            
+            function submitToggled(){
+                const radioButtons = document.querySelectorAll('input[name="questionnaire"]');                
+                let selectedId;
+                for (const radioButton of radioButtons) {
+                    if (radioButton.checked) {
+                        selectedId = radioButton.id;
+                        //UNCHECK BUTTON AFTER SAVING THE SELECTED ID
+                        radioButton.checked = false;
+                        break;
+                    }
+                }
+                // show the output:
+                console.log("SELECTED ID: ", selectedId);
+                if(selectedId !== null){
+                    startExecuteNewAnswer(selectedId);
+                }
+                hideQuestionnaireElements();
+                showSuccessElements(`You successfully selected the question with ID: ${selectedId}`);
+
+            }
+
+            function hideQuestionnaireElements(){
+                document.getElementById("start-header").style.display = "none";
+                questionnaire_div.style.display = "none";
+            }
+
+            function showSuccessElements(message){
+                document.getElementById("success-header").style.display = "block";
+                document.getElementById("success-text").innerText = message;
+                document.getElementById("success-text").style.display = "block";
+                document.getElementById("success-return-button").style.display = "block";
+            }
+
+            function showQuestionnaireElements(){
+                document.getElementById("start-header").style.display = "block";
+                questionnaire_div.style.display = "block";
+            }
+
+            function hideSuccessElements(){
+                document.getElementById("success-header").style.display = "none";
+                document.getElementById("success-text").style.display = "none";
+                document.getElementById("success-return-button").style.display = "none";
+            }
+
+            startFetchQuestionMenu().then((data) => {
+                let questionnaireJSONData = data;x
+                console.log("JSON: ", questionnaireJSONData);
+                generateQuestionnaireGUI(questionnaireJSONData["questionnaire"]);
+            });
+                </script>
     </body>
 </html>
